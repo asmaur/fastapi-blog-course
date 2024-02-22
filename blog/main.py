@@ -1,27 +1,14 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from . import schemas, models
-from .database import engine, SessionLocal
+from fastapi import (
+    FastAPI
+)
+from . import models
+from .database import engine
+from .routers import blog_router, user_router, authentication
+
 app = FastAPI()
+app.include_router(authentication.router)
+app.include_router(blog_router.router)
+app.include_router(user_router.router)
+
 
 models.Base.metadata.create_all(bind=engine)
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@app.post("/blog")
-def create(request: schemas.Blog, db: Session = Depends(get_db)):
-    new_blog = models.Blog(
-        title=request.title,
-        body=request.body
-    )
-    db.add(new_blog)
-    db.commit()
-    db.refresh(new_blog)
-    return new_blog
