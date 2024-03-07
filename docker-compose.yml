@@ -6,4 +6,20 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8008:8000
+      - 8080:8000
+  db:
+    container_name: mysqlDB
+    hostname: mysqlDB
+    image: mysql
+    restart: always
+    env_file:
+      - .db.env
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db:/var/lib/mysql
+
+volumes:
+  my-db:
